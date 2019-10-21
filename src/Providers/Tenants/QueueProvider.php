@@ -27,14 +27,16 @@ class QueueProvider extends ServiceProvider
     public function boot()
     {
         $this->app['queue']->createPayloadUsing(function (string $connection, string $queue = null, array $payload = []) {
+            info('payload', compact('payload'));
             /** @var Environment $environment */
             $environment = resolve(Environment::class);
 
             /** @var mixed|null $website_id */
             $website_id = Arr::get($payload, 'data.command')->website_id ?? optional($environment->tenant())->getKey();
-            
+
             $payload['website_id'] = $website_id;
 
+            info('payload after', compact('payload'));
             return $payload;
         });
 
@@ -50,7 +52,7 @@ class QueueProvider extends ServiceProvider
                 $environment->tenant($tenant);
             }
         });
-        
+
         $this->app->make(Dispatcher::class)->pipeThrough([DispatcherMiddleware::class]);
     }
 }
