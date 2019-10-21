@@ -32,8 +32,10 @@ class QueueProvider extends ServiceProvider
 
             /** @var mixed|null $website_id */
             $website_id = Arr::get($payload, 'data.command')->website_id ?? optional($environment->tenant())->getKey();
+            
+            $payload['website_id'] = $website_id;
 
-            return array_merge($payload, ['website_id' => $website_id]);
+            return $payload;
         });
 
         $this->app['events']->listen(JobProcessing::class, function ($event) {
